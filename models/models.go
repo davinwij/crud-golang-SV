@@ -1,25 +1,25 @@
 package models
 
-import (
-	"time"
-
-	"gorm.io/gorm"
-)
-
 type USER struct {
-	gorm.Model
+	ID   int    `json:"id" gorm:"primaryKey;autoIncrement:false"`
 	Name string `json:"name" binding:"required"`
 	Age  int    `json:"age" binding:"required,number"`
 }
 
 type RISK_PROFILE struct {
-	USER         USER `gorm:"foreignKey:UserId"`
-	UserId       int
 	MMPercent    float32
 	BondPercent  float32
 	StockPercent float32
-	CreatedAt    time.Time
-	UpdatedAt    time.Time
+	UserID       int
+}
+
+type USER_DETAIL struct {
+	ID           int     `json:"id"`
+	Name         string  `json:"name"`
+	Age          int     `json:"age"`
+	MMPercent    float32 `json:"mmpercent"`
+	BondPercent  float32 `json:"bondpercent"`
+	StockPercent float32 `json:"stockpercent"`
 }
 
 type Result struct {

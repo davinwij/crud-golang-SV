@@ -24,5 +24,6 @@ func ConnectDB() {
 
 	fmt.Println("Database Connection Success")
 
-	DB.AutoMigrate(models.USER{}, models.RISK_PROFILE{})
+	DB.AutoMigrate(models.USER{})
+	DB.AutoMigrate(models.RISK_PROFILE{})
 }
