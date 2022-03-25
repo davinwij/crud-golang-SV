@@ -16,7 +16,7 @@ var (
 
 func ConnectDB() {
 
-	DB, Err = gorm.Open("mysql", "root:@/simple-crud-golang?charset=utf8&parseTime=True")
+	DB, Err = gorm.Open("mysql", "davin:q5gJGNVah4leh3Jl@/davin?charset=utf8&parseTime=True")
 
 	if Err != nil {
 		log.Fatal(Err)
