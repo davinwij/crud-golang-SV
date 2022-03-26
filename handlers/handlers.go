@@ -8,7 +8,6 @@ import (
 )
 
 func Handlers() {
-	log.Println("Start development server localhost:8000")
 	router := mux.NewRouter().StrictSlash(true)
 
 	router.HandleFunc("/", Hello).Methods("OPTIONS", "GET")
