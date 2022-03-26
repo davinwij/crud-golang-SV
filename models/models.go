@@ -1,9 +1,15 @@
 package models
 
 type USER struct {
-	ID   int    `json:"id" gorm:"primaryKey;autoIncrement:false"`
-	Name string `json:"name" binding:"required"`
-	Age  int    `json:"age" binding:"required,number"`
+	ID       int    `json:"id" gorm:"primaryKey;autoIncrement:false"`
+	Name     string `json:"name" binding:"required"`
+	Age      int    `json:"age" binding:"required,number"`
+	Password string `json:"password" binding:"required"`
+}
+
+type USER_LOGIN_DETAIL struct {
+	Name     string `json:"name"`
+	Password string `json:"password" binding:"required"`
 }
 
 type RISK_PROFILE struct {

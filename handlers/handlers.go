@@ -14,6 +14,7 @@ func Handlers() {
 	router.HandleFunc("/user", CreateUser).Methods("OPTIONS", "POST")
 	router.HandleFunc("/users", GetUsers).Methods("OPTIONS", "GET")
 	router.HandleFunc("/user/{id}", GetUser).Methods("OPTIONS", "GET")
+	router.HandleFunc("/user-login", LoginUser).Methods("POST")
 
 	log.Fatal(http.ListenAndServe(":5001", router))
 }

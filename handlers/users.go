@@ -12,6 +12,8 @@ import (
 
 	"github.com/gorilla/mux"
 	_ "github.com/gorilla/mux"
+
+	"golang.org/x/crypto/bcrypt"
 )
 
 var (
@@ -30,6 +32,11 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 	var userInput models.USER
 	var userRisk models.RISK_PROFILE
 	json.Unmarshal(payloads, &userInput)
+
+	bytes, err := bcrypt.GenerateFromPassword([]byte(userInput.Password), 10)
+
+	userInput.Password = string(bytes)
+
 	countRisk(userInput.Age)
 	connection.DB.Create(&userInput)
 
@@ -46,7 +53,51 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 
-	w.Header().Set("Content Type", "applicaiton/json")
+	w.Header().Set("Content Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	w.Write(result)
+}
+
+func LoginUser(w http.ResponseWriter, r *http.Request) {
+	payloads, _ := ioutil.ReadAll(r.Body)
+
+	var userPayloads models.USER_LOGIN_DETAIL
+	var user models.USER
+	json.Unmarshal(payloads, userPayloads)
+
+	error := connection.DB.First(&user, "name = ?", userPayloads.Name)
+
+	if error != nil {
+		res := models.Result{Code: 400, Data: "", Message: "Wrong name/password"}
+		result, err := json.Marshal(res)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+		}
+		w.Write(result)
+		return
+	}
+
+	err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(userPayloads.Password))
+
+	if err != nil {
+		res := models.Result{Code: 400, Data: "", Message: "Wrong name/password"}
+		result, err := json.Marshal(res)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+		}
+		w.Write(result)
+		return
+	}
+
+	res := models.Result{Code: 200, Data: &user.Name, Message: "Login Success"}
+
+	result, err := json.Marshal(res)
+
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+
+	w.Header().Set("Content Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	w.Write(result)
 }
