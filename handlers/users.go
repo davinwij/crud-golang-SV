@@ -33,9 +33,9 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 	var userRisk models.RISK_PROFILE
 	json.Unmarshal(payloads, &userInput)
 
-	bytes, err := bcrypt.GenerateFromPassword([]byte(userInput.Password), 10)
+	hash, err := HashPassword(userInput.Password)
 
-	userInput.Password = string(bytes)
+	userInput.Password = hash
 
 	countRisk(userInput.Age)
 	connection.DB.Create(&userInput)
@@ -63,19 +63,9 @@ func LoginUser(w http.ResponseWriter, r *http.Request) {
 
 	var userPayloads models.USER_LOGIN_DETAIL
 	var user models.USER
-	json.Unmarshal(payloads, userPayloads)
+	json.Unmarshal(payloads, &userPayloads)
 
-	error := connection.DB.First(&user, "name = ?", userPayloads.Name)
-
-	if error != nil {
-		res := models.Result{Code: 400, Data: "", Message: "Wrong name/password"}
-		result, err := json.Marshal(res)
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-		}
-		w.Write(result)
-		return
-	}
+	connection.DB.First(&user, "name = ?", userPayloads.Name)
 
 	err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(userPayloads.Password))
 
@@ -177,4 +167,9 @@ func countRisk(age int) {
 		mmP = 100 - (stockP + bondP)
 		return
 	}
+}
+
+func HashPassword(password string) (string, error) {
+	bytes, err := bcrypt.GenerateFromPassword([]byte(password), 14)
+	return string(bytes), err
 }
